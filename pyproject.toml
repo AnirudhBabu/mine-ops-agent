@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mine_ops_agent", "evals"]
+
+[project]
+name = "mine-ops-agent"
+version = "0.1.0"
+description = "Governed multi-agent maintenance and procurement assistant over a mock Oracle Fusion-style REST API"
+authors = [{ name = "Anirudh Babu", email = "anirudhbabu2001@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "httpx>=0.27",
+    "openai>=1.40",
+    "opentelemetry-api>=1.25",
+    "opentelemetry-sdk>=1.25",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "uvicorn>=0.29"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

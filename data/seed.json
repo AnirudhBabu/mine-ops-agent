@@ -1,0 +1,34 @@
+{
+  "assets": [
+    {"AssetId": "HT-101", "AssetNumber": "HT-101", "Description": "Haul truck 240t", "AssetType": "HAUL_TRUCK", "Site": "North Pit", "OperatingHours": 12480, "LastServiceHours": 11900, "ServiceIntervalHours": 500, "Status": "IN_SERVICE"},
+    {"AssetId": "HT-102", "AssetNumber": "HT-102", "Description": "Haul truck 240t", "AssetType": "HAUL_TRUCK", "Site": "North Pit", "OperatingHours": 9870, "LastServiceHours": 9600, "ServiceIntervalHours": 500, "Status": "IN_SERVICE"},
+    {"AssetId": "HT-103", "AssetNumber": "HT-103", "Description": "Haul truck 240t", "AssetType": "HAUL_TRUCK", "Site": "South Pit", "OperatingHours": 15320, "LastServiceHours": 14700, "ServiceIntervalHours": 500, "Status": "IN_SERVICE"},
+    {"AssetId": "EX-201", "AssetNumber": "EX-201", "Description": "Hydraulic excavator", "AssetType": "EXCAVATOR", "Site": "North Pit", "OperatingHours": 8020, "LastServiceHours": 7900, "ServiceIntervalHours": 250, "Status": "IN_SERVICE"},
+    {"AssetId": "CR-301", "AssetNumber": "CR-301", "Description": "Primary gyratory crusher", "AssetType": "CRUSHER", "Site": "Processing Plant", "OperatingHours": 20110, "LastServiceHours": 19200, "ServiceIntervalHours": 1000, "Status": "DEGRADED"}
+  ],
+  "workOrders": [
+    {"WorkOrderId": 5001, "WorkOrderNumber": "WO-5001", "AssetId": "CR-301", "Description": "Liner wear inspection", "WorkOrderType": "PREVENTIVE", "Status": "OPEN", "Priority": "HIGH"},
+    {"WorkOrderId": 5002, "WorkOrderNumber": "WO-5002", "AssetId": "HT-102", "Description": "Tyre rotation", "WorkOrderType": "PREVENTIVE", "Status": "COMPLETED", "Priority": "MEDIUM"}
+  ],
+  "inventoryItems": [
+    {"ItemNumber": "FLT-OIL-240", "Description": "Engine oil filter, 240t haul truck", "UOM": "EA", "OnHandQuantity": 2, "ReorderPoint": 6, "UnitPrice": 85.0, "Subinventory": "NP-STORES"},
+    {"ItemNumber": "FLT-AIR-240", "Description": "Air filter element, 240t haul truck", "UOM": "EA", "OnHandQuantity": 9, "ReorderPoint": 4, "UnitPrice": 140.0, "Subinventory": "NP-STORES"},
+    {"ItemNumber": "OIL-15W40-205L", "Description": "Engine oil 15W-40, 205L drum", "UOM": "DRUM", "OnHandQuantity": 5, "ReorderPoint": 3, "UnitPrice": 610.0, "Subinventory": "NP-STORES"},
+    {"ItemNumber": "LNR-GYR-MNT", "Description": "Gyratory crusher mantle liner", "UOM": "EA", "OnHandQuantity": 0, "ReorderPoint": 1, "UnitPrice": 48500.0, "Subinventory": "PLANT-STORES"},
+    {"ItemNumber": "HYD-HOSE-EX", "Description": "Hydraulic hose assembly, excavator boom", "UOM": "EA", "OnHandQuantity": 3, "ReorderPoint": 2, "UnitPrice": 920.0, "Subinventory": "NP-STORES"}
+  ],
+  "serviceKits": {
+    "HAUL_TRUCK": [
+      {"ItemNumber": "FLT-OIL-240", "Quantity": 2},
+      {"ItemNumber": "FLT-AIR-240", "Quantity": 1},
+      {"ItemNumber": "OIL-15W40-205L", "Quantity": 1}
+    ],
+    "EXCAVATOR": [
+      {"ItemNumber": "HYD-HOSE-EX", "Quantity": 1}
+    ],
+    "CRUSHER": [
+      {"ItemNumber": "LNR-GYR-MNT", "Quantity": 1}
+    ]
+  },
+  "purchaseRequisitions": []
+}
