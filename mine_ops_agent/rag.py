@@ -14,7 +14,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-DOCS_DIR = Path(__file__).resolve().parent.parent / "docs" / "sops"
+DOCS_DIR = Path(__file__).resolve().parent / "knowledge"
 _TOKEN = re.compile(r"[a-z0-9]+")
 _STOP = {"the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "is", "are", "be", "with",
          "at", "by", "it", "its", "as", "any", "all", "each", "must", "can", "when", "than", "what", "do", "we"}

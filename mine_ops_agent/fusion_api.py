@@ -21,7 +21,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-SEED_PATH = Path(__file__).resolve().parent.parent / "data" / "seed.json"
+SEED_PATH = Path(__file__).resolve().parent / "seed.json"
 BASE = "/fscmRestApi/resources/latest"
 
 

@@ -1,6 +1,6 @@
 """Evaluation harness.
 
-Scores each case on four checks and writes evals/report.json:
+Scores each case on four checks and writes eval-report.json:
 
 * tool_selection   expected tools were called, forbidden tools were not
 * tool_arguments   key arguments match (e.g. the asset ids handed from maintenance to procurement)
@@ -17,6 +17,7 @@ Set LLM_BASE_URL, LLM_API_KEY and LLM_MODEL to score a real model (OCI Generativ
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -24,7 +25,7 @@ from mine_ops_agent.governance import User
 from mine_ops_agent.session import build_session, default_llm
 
 CASES = Path(__file__).with_name("cases.json")
-REPORT = Path(__file__).with_name("report.json")
+REPORT = Path(os.getenv("EVAL_REPORT", "eval-report.json"))  # written to the working directory
 
 
 def _system_of_record_counts(session) -> tuple[int, int] | None:

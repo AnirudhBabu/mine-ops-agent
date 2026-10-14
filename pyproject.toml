@@ -1,27 +1,44 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68,<81"]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-packages = ["mine_ops_agent", "evals"]
 
 [project]
 name = "mine-ops-agent"
 version = "0.1.0"
 description = "Governed multi-agent maintenance and procurement assistant over a mock Oracle Fusion-style REST API"
+readme = "README.md"
+license = "MIT"
 authors = [{ name = "Anirudh Babu", email = "anirudhbabu2001@gmail.com" }]
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.15"
+# Runtime needs only what the offline agent, API and tracing use.
 dependencies = [
-    "fastapi>=0.110",
-    "httpx>=0.27",
-    "openai>=1.40",
-    "opentelemetry-api>=1.25",
-    "opentelemetry-sdk>=1.25",
+    "fastapi>=0.115,<1",
+    "httpx2>=2.13,<3",
+    "pydantic>=2.7,<3",
+    "opentelemetry-api>=1.25,<2",
+    "opentelemetry-sdk>=1.25,<2",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "uvicorn>=0.29"]
+# Real model calls (OCI Generative AI, OpenAI, Ollama) are opt-in.
+llm = ["openai>=1.40,<4"]
+# Serve the mock API as a real HTTP server.
+server = ["uvicorn>=0.29,<1"]
+
+[project.scripts]
+mine-ops-agent = "mine_ops_agent.__main__:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.setuptools]
+packages = ["mine_ops_agent", "evals"]
+
+[tool.setuptools.package-data]
+mine_ops_agent = ["seed.json", "knowledge/*.md"]
+evals = ["cases.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = ["error::DeprecationWarning:mine_ops_agent"]

@@ -9,9 +9,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Any, Callable
-
-import httpx
+from typing import Any, Callable, Protocol
 
 from .governance import (ApprovalQueue, AuditLog, Decision, PendingAction, User, evaluate, new_action_id)
 from .rag import BM25Index, default_index
@@ -21,21 +19,37 @@ BASE = "/fscmRestApi/resources/latest"
 OVERDUE_FACTOR = 1.10  # SOP-MNT-014: more than 10 percent past interval
 
 
-class FusionClient:
-    """Thin REST client. Works against the real mock server or an in-process TestClient."""
+class HTTPClient(Protocol):
+    """Anything with httpx-style get/post: an httpx2.Client, or Starlette's in-process TestClient."""
 
-    def __init__(self, http: httpx.Client) -> None:
+    def get(self, url: str, *, params: dict | None = None) -> Any: ...
+    def post(self, url: str, *, json: Any = None) -> Any: ...
+
+
+class FusionAPIError(Exception):
+    def __init__(self, status_code: int, body: str) -> None:
+        super().__init__(f"API {status_code}: {body}")
+        self.status_code = status_code
+
+
+class FusionClient:
+    """Thin REST client. Error handling uses status codes, not a specific HTTP library's exceptions."""
+
+    def __init__(self, http: HTTPClient) -> None:
         self.http = http
 
-    def get(self, resource: str, **params: Any) -> Any:
-        r = self.http.get(f"{BASE}/{resource}", params={k: v for k, v in params.items() if v is not None})
-        r.raise_for_status()
+    @staticmethod
+    def _json(r: Any) -> Any:
+        if r.status_code >= 400:
+            raise FusionAPIError(r.status_code, r.text)
         return r.json()
 
+    def get(self, resource: str, **params: Any) -> Any:
+        return self._json(self.http.get(f"{BASE}/{resource}",
+                                        params={k: v for k, v in params.items() if v is not None}))
+
     def post(self, resource: str, body: dict) -> Any:
-        r = self.http.post(f"{BASE}/{resource}", json=body)
-        r.raise_for_status()
-        return r.json()
+        return self._json(self.http.post(f"{BASE}/{resource}", json=body))
 
 
 @dataclass
@@ -226,8 +240,8 @@ class ToolRuntime:
 
         try:
             result = spec.fn(**args)
-        except httpx.HTTPStatusError as e:
-            return {"error": f"API {e.response.status_code}: {e.response.text}"}
+        except FusionAPIError as e:
+            return {"error": str(e)}
         except TypeError as e:
             return {"error": f"Invalid arguments: {e}"}
         self.audit.record("tool.executed", self.user, tool=name, agent=agent)

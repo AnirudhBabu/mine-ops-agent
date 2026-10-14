@@ -49,35 +49,53 @@ flowchart LR
 
 ## Quick start
 
+Dependencies are managed with [uv](https://docs.astral.sh/uv/) and pinned in `uv.lock`.
+
 ```bash
-pip install -e ".[dev]"
-python -m mine_ops_agent demo          # scripted walkthrough, no API key needed
-pytest -q                              # 17 tests
-python -m evals.run_evals              # eval report, written to evals/report.json
+uv sync                                     # exact versions from uv.lock, plus pytest
+uv run mine-ops-agent demo                  # scripted walkthrough, no API key needed
+uv run pytest -q                            # 18 tests
+uv run python -m evals.run_evals            # eval report, written to ./eval-report.json
 ```
 
 Ask your own question, as a given role, with an interactive approval prompt:
 
 ```bash
-python -m mine_ops_agent ask "Check spares for crusher CR-301 and raise a requisition" --role planner
+uv run mine-ops-agent ask "Check spares for crusher CR-301 and raise a requisition" --role planner
 ```
 
 Run the API as a real server and point the agent at it:
 
 ```bash
-uvicorn mine_ops_agent.fusion_api:app --port 8000
-FUSION_BASE_URL=http://localhost:8000 python -m mine_ops_agent demo
+uv sync --extra server
+uv run uvicorn mine_ops_agent.fusion_api:app --port 8000
+FUSION_BASE_URL=http://localhost:8000 uv run mine-ops-agent demo
 ```
+
+## Dependencies
+
+| Install | Adds | When you need it |
+|---|---|---|
+| core | FastAPI, httpx2, Pydantic, OpenTelemetry | Always: agent, mock API, governance, tracing, evals |
+| `--extra llm` | `openai` | Calling a real model (OCI Generative AI, OpenAI, Ollama) |
+| `--extra server` | `uvicorn` | Serving the mock API over HTTP |
+| `dev` group | `pytest` | Running the tests (installed by `uv sync` by default) |
+
+* **Pinned, not floating.** `pyproject.toml` declares compatible ranges with upper bounds; `uv.lock` pins every transitive package. CI runs `uv sync --locked`, which fails if the lockfile drifts from `pyproject.toml`.
+* **pip users** can install the same pinned runtime set with `pip install -r requirements.txt && pip install -e . --no-deps`. CI checks that `requirements.txt` matches the lockfile.
+* **One HTTP library.** The runtime uses `httpx2`, the maintained successor to `httpx` that Starlette's test client now expects. The REST client checks status codes itself rather than catching a library-specific exception, so the in-process and remote modes behave identically (covered by a test).
+* **Self-contained package.** Seed data, SOPs and eval cases ship inside the wheel, so an installed copy works outside the repo. CI tests Python 3.11, 3.12 and 3.13.
 
 ## Using a real model (OCI Generative AI)
 
 OCI Generative AI exposes an OpenAI-compatible endpoint, so the same adapter works by setting three variables:
 
 ```bash
+uv sync --extra llm
 export LLM_BASE_URL="https://inference.generativeai.<region>.oci.oraclecloud.com/openai/v1"
 export LLM_API_KEY="<OCI Generative AI API key>"
 export LLM_MODEL="<a tool-calling model id from your region's catalogue>"
-python -m evals.run_evals
+uv run python -m evals.run_evals
 ```
 
 The same variables work with OpenAI or a local Ollama server (`LLM_BASE_URL=http://localhost:11434/v1`). With a real model, the eval harness measures the model's routing and tool choice; offline it measures the orchestration and governance code.

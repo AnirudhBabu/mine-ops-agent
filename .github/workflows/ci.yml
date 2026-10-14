@@ -5,12 +5,21 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - run: pytest -q
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      # --locked fails the build if uv.lock is out of date with pyproject.toml
+      - run: uv sync --locked --all-extras
+      - run: uv run pytest -q
       - name: Offline evals (orchestration and governance)
-        run: python -m evals.run_evals
+        run: uv run python -m evals.run_evals
+      - name: Exported requirements match the lockfile
+        run: |
+          uv export --locked --no-dev --no-emit-project --no-hashes -o requirements.txt
+          git diff --exit-code requirements.txt

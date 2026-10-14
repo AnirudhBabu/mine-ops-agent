@@ -56,6 +56,12 @@ def test_another_planner_cannot_confirm_someone_elses_action():
         s.approvals.approve(a, User("other", "planner"))
 
 
+def test_api_errors_come_back_as_tool_errors_not_crashes():
+    s = build_session(TECH)
+    out = s.runtime.call("get_asset", {"asset_id": "XX-999"}, "t")
+    assert out["error"].startswith("API 404")
+
+
 def test_denied_call_is_audited():
     s = build_session(TECH)
     assert s.runtime.call("create_work_order", {"asset_id": "HT-101", "description": "x"}, "t")["status"] == "denied"

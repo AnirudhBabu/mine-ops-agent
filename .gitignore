@@ -5,4 +5,6 @@ __pycache__/
 .venv/
 .env
 audit.jsonl
-evals/report.json
+eval-report.json
+build/
+dist/

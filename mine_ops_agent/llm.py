@@ -54,7 +54,11 @@ class OpenAICompatibleLLM:
     """
 
     def __init__(self, base_url: str | None = None, api_key: str | None = None, model: str | None = None) -> None:
-        from openai import OpenAI
+        try:
+            from openai import OpenAI
+        except ImportError as e:
+            raise RuntimeError("Real model calls need the 'llm' extra: uv sync --extra llm "
+                               "(or pip install 'mine-ops-agent[llm]')") from e
 
         self.model = model or os.environ["LLM_MODEL"]
         self.client = OpenAI(base_url=base_url or os.getenv("LLM_BASE_URL"),
