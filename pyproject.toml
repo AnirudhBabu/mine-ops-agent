@@ -24,6 +24,8 @@ dependencies = [
 llm = ["openai>=1.40,<4"]
 # Serve the mock API as a real HTTP server.
 server = ["uvicorn>=0.29,<1"]
+# Export traces to Jaeger or Tempo over OTLP/HTTP.
+otlp = ["opentelemetry-exporter-otlp-proto-http>=1.25,<2"]
 
 [project.scripts]
 mine-ops-agent = "mine_ops_agent.__main__:main"
